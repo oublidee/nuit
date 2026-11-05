@@ -1,76 +1,137 @@
-# NUIT
+# NUIT 1.0
 
-NUIT est un outil personnel de téléchargement YouTube pour macOS, avec une interface sombre en français. L’application tient dans un seul fichier : `index.php`.
+NUIT est un outil YouTube pour macOS avec une interface sombre en français. **L’application tient dans un seul fichier : `index.php`.**
 
-## Site Internet avec service local
+Ce dépôt public sert à partager le fichier, conserver les versions et distribuer les mises à jour. NUIT s’exécute sur votre Mac.
 
-**Site : https://oublidee.github.io/nuit/**
+## Fonctionnalités
 
-L’interface web est une adaptation distincte de la version 1.0 locale validée. Elle nécessite un service sur le Mac ; elle ne fonctionne pas entièrement dans le cloud.
-
-1. Installer les outils (voir ci-dessous).
-2. Télécharger `service.php` dans un dossier dédié et ouvrir ce dossier dans Terminal.
-3. Arrêter l’ancienne instance de NUIT avec `Ctrl+C` dans son Terminal, si elle utilise déjà le port 8787.
-4. Lancer :
-
-   ```sh
-   php -S 127.0.0.1:8787 service.php
-   ```
-
-5. Ouvrir `http://127.0.0.1:8787/` dans Brave, choisir le dossier de destination puis cliquer sur **Autoriser le site pendant 8 heures**.
-6. Copier le code privé et le coller dans **Connecter mon Mac** sur le site Internet. Brave peut demander l’autorisation d’accéder à cet ordinateur.
-7. Garder Terminal ouvert pendant les transferts.
-
-Le service reste limité à `127.0.0.1`. Aucun port du routeur n’a besoin d’être ouvert. Les fichiers et la session Brave restent sur le Mac. Le site public reçoit les titres, chemins de destination et informations de progression nécessaires à l’affichage, directement depuis le service local ; il n’a pas de serveur collectant ces données.
-
-Le code de connexion est un secret : il autorise le site à utiliser le service local. Il est valable 8 heures et mémorisé uniquement pour l’onglet du navigateur. **Révoquer l’accès du site** sur la page locale ou **Déconnecter ce site** sur la page web invalide le code. Les transferts déjà lancés peuvent se terminer.
-
-Le site ne peut agir que dans le dossier autorisé. Pour en changer depuis le site, utiliser **Choisir…**, puis sélectionner le nouveau dossier dans le dialogue natif du Finder. Un changement manuel du chemin sur le site ne suffit pas à donner accès à un autre dossier.
-
-Le contrôle d’origine autorise `https://oublidee.github.io`. Les autres sites publiés sous cette même origine doivent également être considérés comme du code de confiance. En cas de doute sur un code de connexion, le révoquer depuis la page locale.
-
-Pour régénérer `index.html` après une modification de `service.php` : `python3 build-site.py`. Le générateur ajoute une politique de sécurité avec les empreintes du script et des styles.
-
-## Version 1.0 locale validée
-
-Cette version est validée en utilisation locale. Elle ouvre YouTube dans un autre onglet, utilise facultativement la session Brave, et télécharge une vidéo MP4 ou un fichier audio MP3 dans le dossier choisi.
-
-Fonctions : dossier mémorisé dans le navigateur, progression du transfert, historique, sélection multiple et choix entre effacement de l’historique seul ou mise des fichiers dans la Corbeille du Mac.
+- Ouvrir YouTube dans un autre onglet et coller le lien d’une vidéo.
+- Télécharger une vidéo en MP4 ou son audio en MP3.
+- Utiliser, au choix, la session YouTube déjà ouverte dans Brave.
+- Choisir un dossier sur le Mac et le retrouver après rechargement.
+- Afficher la progression et les derniers téléchargements.
+- Sélectionner plusieurs entrées et effacer l’historique seul, ou mettre aussi les fichiers dans la Corbeille du Mac.
 
 ## Installation sur macOS
 
-Avec Homebrew déjà installé, exécuter dans Terminal :
+### 1. Installer Homebrew
+
+Homebrew installe les outils nécessaires. Si la commande `brew --version` fonctionne déjà dans Terminal, passez à l’étape suivante.
+
+Sinon, ouvrez Terminal et exécutez la commande officielle publiée sur [brew.sh](https://brew.sh/) :
 
 ```sh
-brew install php yt-dlp ffmpeg node
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 ```
 
-Télécharger `index.php` dans un dossier dédié, ouvrir ce dossier dans Terminal, puis lancer :
+Suivez les instructions affichées. Homebrew peut demander d’installer les outils de développement Apple et de saisir le mot de passe du Mac. Terminez les instructions **Next steps** affichées à la fin, notamment celles qui ajoutent Homebrew au chemin des commandes. Les commandes exactes dépendent de votre Mac. Ouvrez ensuite un nouveau Terminal et vérifiez :
+
+```sh
+brew --version
+```
+
+### 2. Installer PHP, ffmpeg et yt-dlp
+
+```sh
+brew install php ffmpeg yt-dlp node
+```
+
+- **PHP 8.1 ou ultérieur** exécute le fichier `index.php` sur le Mac.
+- **yt-dlp** télécharge la vidéo ou l’audio.
+- **ffmpeg** assemble la vidéo et l’audio et permet la conversion en MP3.
+- **Node.js** fournit le moteur JavaScript utilisé par yt-dlp pour certaines vérifications YouTube.
+
+Vérifiez l’installation :
+
+```sh
+php --version
+ffmpeg -version
+yt-dlp --version
+node --version
+```
+
+NUIT détecte les outils dans les emplacements Homebrew habituels : `/opt/homebrew/bin` sur Apple Silicon et `/usr/local/bin` sur les Mac Intel.
+
+### 3. Télécharger NUIT 1.0
+
+Ouvrez [la version 1.0](https://github.com/oublidee/nuit/releases/tag/v1.0), puis téléchargez **Source code (zip)** dans la section **Assets** et décompressez-le.
+
+Gardez `index.php` dans un dossier dédié. `README.md` contient ce guide et `.gitignore` sert uniquement au suivi Git : ces deux fichiers ne sont pas nécessaires pour lancer l’application.
+
+### 4. Lancer NUIT
+
+Dans Terminal, placez-vous dans le dossier contenant `index.php` : tapez `cd ` (avec un espace), glissez le dossier depuis le Finder dans Terminal, puis appuyez sur Entrée.
+
+Lancez ensuite :
 
 ```sh
 php -S 127.0.0.1:8787 index.php
 ```
 
-Garder Terminal ouvert et ouvrir `http://127.0.0.1:8787` dans Brave. PHP 8.1 ou ultérieur est nécessaire. Un moteur JavaScript compatible avec yt-dlp peut également être nécessaire ; NUIT détecte Node.js lorsqu’il est installé dans un emplacement standard.
+Gardez cette fenêtre Terminal ouverte. Dans **Brave**, ouvrez :
 
-macOS peut demander l’accès au trousseau pour la session Brave, et l’autorisation de contrôler le Finder pour mettre des fichiers dans la Corbeille.
+**http://127.0.0.1:8787/**
 
-## Sécurité et confidentialité
+Il faut passer par cette adresse ; un double-clic sur le fichier PHP ne lance pas l’application. Pour arrêter NUIT, faites **Ctrl+C** dans Terminal. Pour le relancer, réexécutez la même commande.
 
-- Le serveur reste limité à `127.0.0.1` ; il ne faut pas l’exposer sur un réseau public.
-- Utiliser exactement la commande ci-dessus, avec `index.php` comme routeur.
-- Aucun mot de passe n’est demandé dans l’interface et aucun fichier de cookies n’est exporté par NUIT.
-- Les préférences et l’historique sont enregistrés dans le navigateur.
-- Les opérations sont protégées par un jeton de session et des contrôles d’origine.
-- Maintenir PHP, yt-dlp, ffmpeg et le moteur JavaScript à jour. Ces protections ne constituent pas une garantie contre toutes les vulnérabilités.
+## Utilisation
 
-## Organisation du projet
+1. Ouvrez YouTube dans Brave avec votre compte habituel.
+2. Copiez le lien de la vidéo et collez-le dans NUIT.
+3. Choisissez le format, la qualité et le dossier de destination.
+4. Cliquez sur **Télécharger sur mon Mac** et gardez la page ouverte jusqu’à la fin.
 
-- `index.php` : version 1.0 locale validée, conservée sans modification.
-- `service.php` : service autonome et interface locale d’association pour la version web.
-- `index.html` : interface statique hébergée par GitHub Pages.
-- `build-site.py` : générateur du site statique, nécessaire seulement pour développer.
+macOS peut demander l’accès au trousseau pour lire la session Brave et l’autorisation de contrôler le Finder pour mettre les fichiers dans la Corbeille. NUIT ne demande aucun mot de passe dans son interface et n’exporte pas de fichier de cookies.
 
-GitHub Pages n’exécute pas PHP. Le fichier `service.php` se lance uniquement sur le Mac de l’utilisateur. Les changements web ne doivent pas être interprétés comme une validation de la version web équivalente aux essais de la 1.0 locale.
+Pour une vidéo publique, vous pouvez désactiver **Utiliser ma session YouTube dans Brave**. Si vous avez plusieurs profils Brave, l’option de profil accepte `Default`, `Profile 1`, `Profile 2`, etc. Le chemin du profil est indiqué dans `brave://version`.
 
-Télécharger uniquement les contenus pour lesquels on dispose des droits nécessaires. Projet indépendant, non affilié à YouTube ou Google.
+## Versions et mises à jour
+
+La version **1.0** est le point de référence validé. Les versions publiées sont disponibles dans [Releases](https://github.com/oublidee/nuit/releases). Les modifications du code sont visibles dans [l’historique des commits](https://github.com/oublidee/nuit/commits/main/).
+
+### Mettre à jour l’application
+
+Arrêtez NUIT avec **Ctrl+C**, conservez une copie de votre ancien `index.php`, puis remplacez-le par celui de la nouvelle version téléchargée dans **Releases**. Relancez la commande PHP et rechargez la page dans Brave.
+
+Le dossier mémorisé et l’historique sont conservés dans le navigateur : utilisez la même adresse et le même profil Brave pour les retrouver.
+
+Les mises à jour de l’application ne sont pas automatiques. GitHub permet de publier, télécharger et comparer les versions. Pour être averti des nouvelles versions, utilisez **Watch → Custom → Releases** sur le dépôt.
+
+### Mettre à jour les outils
+
+```sh
+brew update
+brew upgrade php ffmpeg yt-dlp node
+```
+
+Si YouTube change son fonctionnement et qu’un téléchargement échoue, mettre `yt-dlp` à jour peut résoudre le problème.
+
+### Récupérer le code avec Git (facultatif)
+
+Pour suivre le projet avec Git :
+
+```sh
+git clone https://github.com/oublidee/nuit.git
+cd nuit
+php -S 127.0.0.1:8787 index.php
+```
+
+Pour récupérer les modifications de la branche principale, arrêtez NUIT, puis exécutez depuis ce dossier :
+
+```sh
+git pull --ff-only
+```
+
+La branche `main` peut contenir des changements plus récents qu’une version publiée. Pour une version précise, privilégiez le téléchargement dans **Releases**. Si vous avez modifié le code localement, sauvegardez vos changements avant de mettre à jour.
+
+## Dépannage et sécurité
+
+- **« Address already in use »** : une autre instance utilise le port 8787. Arrêtez-la dans son Terminal avec **Ctrl+C** avant de relancer NUIT.
+- **Outil introuvable** : vérifiez son installation, les instructions Homebrew et les emplacements indiqués plus haut.
+- **Session Brave inaccessible** : ouvrez Brave et examinez les demandes d’autorisation macOS ; pour une vidéo publique, essayez sans la session Brave.
+- Le serveur doit rester sur **127.0.0.1**. Utilisez exactement la commande avec `index.php` comme routeur et ne l’exposez pas sur Internet.
+- Les préférences et l’historique sont stockés dans le navigateur. Les téléchargements restent dans le dossier choisi sur le Mac.
+- Gardez les outils à jour. Les contrôles intégrés ne garantissent pas l’absence de toute vulnérabilité et ne protègent pas un Mac déjà compromis.
+
+Téléchargez uniquement les contenus pour lesquels vous disposez des droits nécessaires. Projet indépendant, non affilié à YouTube ou Google.
